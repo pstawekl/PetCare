@@ -6,6 +6,9 @@ The application manages the server-side of the PetCare system.
 PetCare is a system designed to assist pet owners in organizing care for their pets.  
 It enables scheduling veterinary visits, setting reminders for vaccinations, monitoring pets' diet and activity, and (in the future) integration with external veterinary systems.
 
+### Warning
+Application requires appsettings.json to run
+
 ## Routes
 
 ### Auth
