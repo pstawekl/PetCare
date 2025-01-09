@@ -1,39 +1,72 @@
-﻿namespace PetCare.Controllers
-{
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-    using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
+namespace PetCare.Controllers
+{
     [ApiController]
     [Route("api/[controller]")]
     public class ProfileController : ControllerBase
     {
-        [Authorize]
-        [HttpGet]
-        public IActionResult GetProfile()
+        private readonly AppDbContext _context;
+
+        // Konstruktor kontrolera wizyt
+        public ProfileController(AppDbContext context)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return Ok(new
-            {
-                UserId = userId,
-                Name = "John Doe",
-                Email = "johndoe@example.com"
-            });
+            _context = context;
         }
 
-        [Authorize]
-        [HttpPut]
-        public IActionResult UpdateProfile([FromBody] UpdateProfileDto updateProfile)
+        /// <summary>
+        /// Pobiera profil użytkownika.
+        /// </summary>
+        /// <param name="id">Id użytkownika.</param>
+        /// <param name="dbContext">Kontekst bazy danych.</param>
+        /// <returns>Profil użytkownika.</returns>
+        [HttpPost("{id}")]
+        public async Task<IActionResult> GetProfile(int id, [FromServices] AppDbContext dbContext)
         {
-            // Przykładowa logika aktualizacji danych użytkownika
-            return Ok(new { Message = "Profile updated successfully" });
+            var existingUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+            if (existingUser != null)
+            {
+                return Ok(new
+                {
+                    Id = existingUser.Id,
+                    Email = existingUser.Email,
+                    Username = existingUser.Username
+                });
+            }
+            return NotFound();
+        }
+
+        /// <summary>
+        /// Aktualizuje profil użytkownika.
+        /// </summary>
+        /// <param name="updateProfile">Zaktualizowane dane profilu.</param>
+        /// <returns>Komunikat o sukcesie.</returns>
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateProfile(int id, [FromBody] UpdateProfileDto updateProfile, [FromServices] AppDbContext dbContext)
+        {
+            var existingUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+            if (existingUser != null)
+            {
+                existingUser.Username = updateProfile.Name;
+                existingUser.Email = updateProfile.Email;
+
+                await dbContext.SaveChangesAsync();
+
+                return Ok(new { Message = "Profil zaktualizowany pomyślnie" });
+            }
+            return NotFound();
         }
     }
 
+    // DTO do aktualizacji profilu
     public class UpdateProfileDto
     {
         public string Name { get; set; }
         public string Email { get; set; }
     }
-
 }

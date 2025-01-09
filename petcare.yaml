@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: PetCare
-  version: 1.0
+  version: "1.0"
 paths:
   /api/Auth/login:
     post:

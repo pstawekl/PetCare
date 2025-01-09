@@ -4,7 +4,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using PetCare;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<JwtTokenService>();
@@ -19,17 +18,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "https://yourdomain.com", // Tw�j issuer
-            ValidAudience = "https://yourdomain.com", // Tw�j audience
+            ValidIssuer = "https://yourdomain.com", // Twój issuer
+            ValidAudience = "https://yourdomain.com", // Twój audience
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:SecretKey"])) // Tw�j klucz
+                Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:SecretKey"])) // Twój klucz
         };
     });
 
 // Dodanie autoryzacji
 builder.Services.AddAuthorization();
 
-// Dodanie us�ug do kontenera DI
+// Dodanie usług do kontenera DI
 builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

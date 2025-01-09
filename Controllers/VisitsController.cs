@@ -5,15 +5,21 @@ namespace PetCare.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    // Kontroler do zarządzania wizytami
     public class VisitsController : ControllerBase
     {
         private readonly AppDbContext _context;
 
+        // Konstruktor kontrolera wizyt
         public VisitsController(AppDbContext context)
         {
             _context = context;
         }
 
+        /// <summary>
+        /// Pobiera wszystkie wizyty.
+        /// </summary>
+        /// <returns>Lista wizyt.</returns>
         [HttpGet]
         public async Task<IActionResult> GetAllVisits()
         {
@@ -21,6 +27,11 @@ namespace PetCare.Controllers
             return Ok(visits);
         }
 
+        /// <summary>
+        /// Dodaje nową wizytę.
+        /// </summary>
+        /// <param name="visitCreateDto">Wizyta do dodania.</param>
+        /// <returns>Utworzona wizyta.</returns>
         [HttpPost]
         public async Task<IActionResult> AddVisit([FromBody] VisitCreateDto visitCreateDto)
         {
@@ -36,6 +47,12 @@ namespace PetCare.Controllers
             return CreatedAtAction(nameof(GetAllVisits), new { id = visit.Id }, visit);
         }
 
+        /// <summary>
+        /// Edytuje istniejącą wizytę.
+        /// </summary>
+        /// <param name="id">ID wizyty do edycji.</param>
+        /// <param name="visitCreateDto">Zaktualizowane dane wizyty.</param>
+        /// <returns>Brak zawartości.</returns>
         [HttpPut]
         public async Task<IActionResult> EditVisit(int id, [FromBody] VisitCreateDto visitCreateDto)
         {
@@ -60,6 +77,11 @@ namespace PetCare.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Usuwa wizytę.
+        /// </summary>
+        /// <param name="id">ID wizyty do usunięcia.</param>
+        /// <returns>Brak zawartości.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVisit(int id)
         {
@@ -70,5 +92,4 @@ namespace PetCare.Controllers
             return NoContent();
         }
     }
-
 }

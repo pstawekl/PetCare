@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace PetCare
 {
-
+    // Serwis do generowania i walidacji tokenów JWT
     public class JwtTokenService
     {
         private readonly string _key;
@@ -21,6 +21,7 @@ namespace PetCare
 
         public string SecretKey => _key;
 
+        // Generowanie tokenu dostępu
         public string GenerateAccessToken(string userId, string role)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));
@@ -28,10 +29,10 @@ namespace PetCare
 
             var claims = new[]
             {
-                    new Claim(JwtRegisteredClaimNames.Sub, userId),
-                    new Claim(ClaimTypes.Role, role),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                };
+                new Claim(JwtRegisteredClaimNames.Sub, userId),
+                new Claim(ClaimTypes.Role, role),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
 
             var token = new JwtSecurityToken(
                 issuer: _issuer,
@@ -43,6 +44,7 @@ namespace PetCare
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        // Generowanie tokenu odświeżającego
         public string GenerateRefreshToken(string userId, string role)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));
@@ -50,10 +52,10 @@ namespace PetCare
 
             var claims = new[]
             {
-                    new Claim(JwtRegisteredClaimNames.Sub, userId),
-                    new Claim(ClaimTypes.Role, role),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                };
+                new Claim(JwtRegisteredClaimNames.Sub, userId),
+                new Claim(ClaimTypes.Role, role),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
 
             var token = new JwtSecurityToken(
                 issuer: _issuer,
@@ -65,6 +67,7 @@ namespace PetCare
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        // Walidacja tokenu
         public ClaimsPrincipal ValidateToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -92,17 +95,12 @@ namespace PetCare
         }
     }
 
+    // Ustawienia JWT
     public class JwtSettings
-
     {
-
         public string SecretKey { get; set; }
-
         public string Issuer { get; set; }
-
         public string Audience { get; set; }
-
         public int ExpirationInMinutes { get; set; }
-
     }
 }

@@ -14,6 +14,7 @@ namespace PetCare.Controllers
             _context = context;
         }
 
+        // Pobierz wszystkich użytkowników
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -21,6 +22,7 @@ namespace PetCare.Controllers
             return Ok(users);
         }
 
+        // Zarejestruj nowego użytkownika
         [HttpPost]
         public async Task<IActionResult> RegisterUser([FromBody] UserCreateDto userCreateDto)
         {
@@ -36,6 +38,7 @@ namespace PetCare.Controllers
             return CreatedAtAction(nameof(GetAllUsers), new { id = user.Id }, user);
         }
 
+        // Zaktualizuj istniejącego użytkownika
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserCreateDto userCreateDto)
         {
@@ -57,6 +60,7 @@ namespace PetCare.Controllers
             return NoContent();
         }
 
+        // Usuń użytkownika
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
@@ -67,5 +71,4 @@ namespace PetCare.Controllers
             return NoContent();
         }
     }
-
 }

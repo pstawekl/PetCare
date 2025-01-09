@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 [ApiController]
 [Route("api/[controller]")]
+// Kontroler do zarządzania zwierzętami
 public class PetsController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -13,6 +14,7 @@ public class PetsController : ControllerBase
         _context = context;
     }
 
+    // Pobierz wszystkie zwierzęta
     [HttpGet]
     public async Task<IActionResult> GetAllPets()
     {
@@ -20,6 +22,7 @@ public class PetsController : ControllerBase
         return Ok(pets);
     }
 
+    // Dodaj nowe zwierzę
     [HttpPost]
     public async Task<IActionResult> AddPet([FromBody] PetCreateDto petCreateDto)
     {
@@ -35,6 +38,7 @@ public class PetsController : ControllerBase
         return CreatedAtAction(nameof(GetAllPets), new { id = pet.Id }, pet);
     }
 
+    // Zaktualizuj istniejące zwierzę
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdatePet(int id, [FromBody] PetCreateDto petCreateDto)
     {
@@ -59,6 +63,7 @@ public class PetsController : ControllerBase
         return NoContent();
     }
 
+    // Usuń zwierzę
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePet(int id)
     {

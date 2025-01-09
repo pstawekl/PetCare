@@ -9,18 +9,24 @@ public class AuthController : ControllerBase
 {
     private readonly JwtTokenService _jwtTokenService;
 
-
+    // Konstruktor kontrolera autoryzacji
     public AuthController(AppDbContext context, JwtTokenService jwtTokenService)
     {
         _jwtTokenService = jwtTokenService;
 
-        // Ensure the JWT secret key is at least 128 bits (16 characters)
+        // Upewnij się, że tajny klucz JWT ma co najmniej 128 bitów (16 znaków)
         if (_jwtTokenService.SecretKey.Length < 16)
         {
-            throw new ArgumentOutOfRangeException("SecretKey", "The encryption algorithm 'HS256' requires a key size of at least 128 bits (16 characters).");
+            throw new ArgumentOutOfRangeException("SecretKey", "Algorytm szyfrowania 'HS256' wymaga klucza o rozmiarze co najmniej 128 bitów (16 znaków).");
         }
     }
 
+    /// <summary>
+    /// Logowanie użytkownika.
+    /// </summary>
+    /// <param name="login">Dane logowania.</param>
+    /// <param name="dbContext">Kontekst bazy danych.</param>
+    /// <returns>Tokeny dostępu i odświeżenia.</returns>
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto login, [FromServices] AppDbContext dbContext)
     {
@@ -41,10 +47,15 @@ public class AuthController : ControllerBase
             }
         }
 
-        return Unauthorized(new { Message = "Invalid username or password" });
+        return Unauthorized(new { Message = "Nieprawidłowa nazwa użytkownika lub hasło" });
     }
 
-    
+    /// <summary>
+    /// Rejestracja nowego użytkownika.
+    /// </summary>
+    /// <param name="registerDto">Dane rejestracyjne.</param>
+    /// <param name="dbContext">Kontekst bazy danych.</param>
+    /// <returns>Komunikat o sukcesie.</returns>
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto registerDto, [FromServices] AppDbContext dbContext)
     {
@@ -52,7 +63,7 @@ public class AuthController : ControllerBase
         var existingUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == registerDto.Username);
         if (existingUser != null)
         {
-            return Conflict(new { Message = "User already exists" });
+            return Conflict(new { Message = "Użytkownik już istnieje" });
         }
 
         // Zaszyfruj hasło
@@ -69,12 +80,15 @@ public class AuthController : ControllerBase
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
 
-        return Ok(new { Message = "User registered successfully" });
+        return Ok(new { Message = "Użytkownik zarejestrowany pomyślnie" });
     }
 
-
-
-
+    /// <summary>
+    /// Odświeża token dostępu.
+    /// </summary>
+    /// <param name="user">Dane użytkownika.</param>
+    /// <param name="dbContext">Kontekst bazy danych.</param>
+    /// <returns>Nowe tokeny dostępu i odświeżenia.</returns>
     [HttpPost("refresh")]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto user, [FromServices] AppDbContext dbContext)
     {
@@ -92,8 +106,10 @@ public class AuthController : ControllerBase
             });
         }
 
-        return Unauthorized(new { Message = "Invalid refresh token" });
+        return Unauthorized(new { Message = "Nieprawidłowy token odświeżenia" });
     }
+
+    // Pobiera użytkownika na podstawie nazwy użytkownika
     private async Task<User> GetUser(string username, AppDbContext dbContext)
     {
         var existingUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == username);
@@ -112,24 +128,31 @@ public class AuthController : ControllerBase
         return null;
     }
 
+    /// <summary>
+    /// Weryfikuje token.
+    /// </summary>
+    /// <param name="token">Token do weryfikacji.</param>
+    /// <returns>Komunikat o ważności tokenu.</returns>
     [HttpPost("verify")]
     public IActionResult VerifyToken([FromBody] string token)
     {
         var principal = _jwtTokenService.ValidateToken(token);
         if (principal != null)
         {
-            return Ok(new { Message = "Token is valid" });
+            return Ok(new { Message = "Token jest ważny" });
         }
-        return Unauthorized(new { Message = "Invalid token" });
+        return Unauthorized(new { Message = "Nieprawidłowy token" });
     }
 }
 
+// DTO do logowania
 public class LoginDto
 {
     public string Username { get; set; }
     public string Password { get; set; }
 }
 
+// DTO do rejestracji
 public class RegisterDto
 {
     [Required]
@@ -145,7 +168,7 @@ public class RegisterDto
     public string Password { get; set; }
 }
 
-
+// DTO do odświeżania tokenu
 public class RefreshTokenDto
 {
     public string RefreshToken { get; set; }

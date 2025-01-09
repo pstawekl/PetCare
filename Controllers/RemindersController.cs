@@ -9,11 +9,16 @@ namespace PetCare.Controllers
     {
         private readonly AppDbContext _context;
 
+        // Konstruktor kontrolera przypomnień
         public RemindersController(AppDbContext context)
         {
             _context = context;
         }
 
+        /// <summary>
+        /// Pobiera wszystkie przypomnienia.
+        /// </summary>
+        /// <returns>Lista przypomnień.</returns>
         [HttpGet]
         public async Task<IActionResult> GetAllReminders()
         {
@@ -21,6 +26,11 @@ namespace PetCare.Controllers
             return Ok(reminders);
         }
 
+        /// <summary>
+        /// Dodaje nowe przypomnienie.
+        /// </summary>
+        /// <param name="reminderCreateDto">Przypomnienie do dodania.</param>
+        /// <returns>Utworzone przypomnienie.</returns>
         [HttpPost]
         public async Task<IActionResult> AddReminder([FromBody] ReminderCreateDto reminderCreateDto)
         {
@@ -36,6 +46,12 @@ namespace PetCare.Controllers
             return CreatedAtAction(nameof(GetAllReminders), new { id = reminder.Id }, reminder);
         }
 
+        /// <summary>
+        /// Aktualizuje istniejące przypomnienie.
+        /// </summary>
+        /// <param name="id">ID przypomnienia do aktualizacji.</param>
+        /// <param name="reminderCreateDto">Zaktualizowane dane przypomnienia.</param>
+        /// <returns>Brak zawartości.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateReminder(int id, [FromBody] ReminderCreateDto reminderCreateDto)
         {
@@ -59,6 +75,11 @@ namespace PetCare.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Usuwa przypomnienie.
+        /// </summary>
+        /// <param name="id">ID przypomnienia do usunięcia.</param>
+        /// <returns>Brak zawartości.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReminder(int id)
         {
@@ -69,5 +90,4 @@ namespace PetCare.Controllers
             return NoContent();
         }
     }
-
 }
