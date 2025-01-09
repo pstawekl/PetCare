@@ -3,15 +3,21 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Configuration;
 
 namespace PetCare
 {
 
     public class JwtTokenService
     {
-        private readonly string _key = "32e14f16d39a4f7aeb859f732478ecd1e5ee3b9175487eb1afd353fb699ed8dad76adf78f9ed7d692d63fdea3bd01f7eb4bb79a93377595fcc173aa93f271486"; // Sekretny klucz (zmień na bezpieczny)
-        private readonly string _issuer = "https://yourdomain.com"; // Twój issuer
-        private readonly string _audience = "https://yourdomain.com"; // Twój audience
+        private readonly string _key;
+        private readonly string _issuer = "https://yourdomain.com";
+        private readonly string _audience = "https://yourdomain.com";
+
+        public JwtTokenService(IConfiguration configuration)
+        {
+            _key = configuration["AppSettings:SecretKey"];
+        }
 
         public string SecretKey => _key;
 
@@ -86,4 +92,17 @@ namespace PetCare
         }
     }
 
+    public class JwtSettings
+
+    {
+
+        public string SecretKey { get; set; }
+
+        public string Issuer { get; set; }
+
+        public string Audience { get; set; }
+
+        public int ExpirationInMinutes { get; set; }
+
+    }
 }

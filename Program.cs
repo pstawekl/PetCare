@@ -19,19 +19,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "https://yourdomain.com", // Twój issuer
-            ValidAudience = "https://yourdomain.com", // Twój audience
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your_secret_key")) // Twój klucz
+            ValidIssuer = "https://yourdomain.com", // Twï¿½j issuer
+            ValidAudience = "https://yourdomain.com", // Twï¿½j audience
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:SecretKey"])) // Twï¿½j klucz
         };
     });
 
 // Dodanie autoryzacji
 builder.Services.AddAuthorization();
 
-// Dodanie us³ug do kontenera DI
+// Dodanie usï¿½ug do kontenera DI
 builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    
 builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
 builder.Services.AddLogging(logging =>
@@ -48,7 +50,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHub<NotificationHub>("/notifications");

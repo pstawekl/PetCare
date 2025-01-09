@@ -155,3 +155,4 @@ C:\Users\jastawsk\Documents\vs_projects\PetCare\bin\Debug\net8.0\Microsoft.Ident
 C:\Users\jastawsk\Documents\vs_projects\PetCare\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\Users\jastawsk\Documents\vs_projects\PetCare\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\jastawsk\Documents\vs_projects\PetCare\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+c:\Users\jastawsk\Documents\vs_projects\PetCare\obj\Debug\net8.0\PetCare.sourcelink.json
