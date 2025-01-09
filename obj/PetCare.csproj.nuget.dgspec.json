@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\jastawsk\\Documents\\vs_projects\\PetCare\\PetCare.csproj": {}
+    "C:\\Users\\jastawsk\\Documents\\vs_projects\\PetCare\\PetCare.csproj": {}
   },
   "projects": {
-    "c:\\Users\\jastawsk\\Documents\\vs_projects\\PetCare\\PetCare.csproj": {
+    "C:\\Users\\jastawsk\\Documents\\vs_projects\\PetCare\\PetCare.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\jastawsk\\Documents\\vs_projects\\PetCare\\PetCare.csproj",
+        "projectUniqueName": "C:\\Users\\jastawsk\\Documents\\vs_projects\\PetCare\\PetCare.csproj",
         "projectName": "PetCare",
-        "projectPath": "c:\\Users\\jastawsk\\Documents\\vs_projects\\PetCare\\PetCare.csproj",
+        "projectPath": "C:\\Users\\jastawsk\\Documents\\vs_projects\\PetCare\\PetCare.csproj",
         "packagesPath": "C:\\Users\\jastawsk\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\jastawsk\\Documents\\vs_projects\\PetCare\\obj\\",
+        "outputPath": "C:\\Users\\jastawsk\\Documents\\vs_projects\\PetCare\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",

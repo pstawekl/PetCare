@@ -1,12 +1,12 @@
-openapi: 3.0.1
+openapi: "3.0.1"
 info:
-  title: PetCare
+  title: "PetCare"
   version: "1.0"
 paths:
   /api/Auth/login:
     post:
       tags:
-        - Auth
+        - "Auth"
       requestBody:
         content:
           application/json:
@@ -19,12 +19,12 @@ paths:
             schema:
               $ref: "#/components/schemas/LoginDto"
       responses:
-        '200':
-          description: OK
+        "200":
+          description: "OK"
   /api/Auth/register:
     post:
       tags:
-        - Auth
+        - "Auth"
       requestBody:
         content:
           application/json:
@@ -37,12 +37,12 @@ paths:
             schema:
               $ref: "#/components/schemas/RegisterDto"
       responses:
-        '200':
-          description: OK
+        "200":
+          description: "OK"
   /api/Auth/refresh:
     post:
       tags:
-        - Auth
+        - "Auth"
       requestBody:
         content:
           application/json:
@@ -55,36 +55,36 @@ paths:
             schema:
               $ref: "#/components/schemas/RefreshTokenDto"
       responses:
-        '200':
-          description: OK
+        "200":
+          description: "OK"
   /api/Auth/verify:
     post:
       tags:
-        - Auth
+        - "Auth"
       requestBody:
         content:
           application/json:
             schema:
-              type: string
+              type: "string"
           text/json:
             schema:
-              type: string
+              type: "string"
           application/*+json:
             schema:
-              type: string
+              type: "string"
       responses:
-        '200':
-          description: OK
+        "200":
+          description: "OK"
   /api/Pets:
     get:
       tags:
-        - Pets
+        - "Pets"
       responses:
-        '200':
-          description: OK
+        "200":
+          description: "OK"
     post:
       tags:
-        - Pets
+        - "Pets"
       requestBody:
         content:
           application/json:
@@ -97,19 +97,19 @@ paths:
             schema:
               $ref: "#/components/schemas/PetCreateDto"
       responses:
-        '200':
-          description: OK
+        "200":
+          description: "OK"
   /api/Pets/{id}:
     put:
       tags:
-        - Pets
+        - "Pets"
       parameters:
-        - name: id
-          in: path
+        - name: "id"
+          in: "path"
           required: true
           schema:
-            type: integer
-            format: int32
+            type: "integer"
+            format: "int32"
       requestBody:
         content:
           application/json:
@@ -122,80 +122,364 @@ paths:
             schema:
               $ref: "#/components/schemas/PetCreateDto"
       responses:
-        '200':
-          description: OK
+        "200":
+          description: "OK"
     delete:
       tags:
-        - Pets
+        - "Pets"
       parameters:
-        - name: id
-          in: path
+        - name: "id"
+          in: "path"
           required: true
           schema:
-            type: integer
-            format: int32
+            type: "integer"
+            format: "int32"
       responses:
-        '200':
-          description: OK
+        "200":
+          description: "OK"
+  /api/Profile/{id}:
+    post:
+      tags:
+        - "Profile"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+    put:
+      tags:
+        - "Profile"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileDto"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileDto"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileDto"
+      responses:
+        "200":
+          description: "OK"
+  /api/Reminders:
+    get:
+      tags:
+        - "Reminders"
+      responses:
+        "200":
+          description: "OK"
+    post:
+      tags:
+        - "Reminders"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReminderCreateDto"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/ReminderCreateDto"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/ReminderCreateDto"
+      responses:
+        "200":
+          description: "OK"
+  /api/Reminders/{id}:
+    put:
+      tags:
+        - "Reminders"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReminderCreateDto"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/ReminderCreateDto"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/ReminderCreateDto"
+      responses:
+        "200":
+          description: "OK"
+    delete:
+      tags:
+        - "Reminders"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+  /api/Users:
+    get:
+      tags:
+        - "Users"
+      responses:
+        "200":
+          description: "OK"
+    post:
+      tags:
+        - "Users"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateDto"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateDto"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/UserCreateDto"
+      responses:
+        "200":
+          description: "OK"
+  /api/Users/{id}:
+    put:
+      tags:
+        - "Users"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateDto"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateDto"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/UserCreateDto"
+      responses:
+        "200":
+          description: "OK"
+    delete:
+      tags:
+        - "Users"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+  /api/Visits:
+    get:
+      tags:
+        - "Visits"
+      responses:
+        "200":
+          description: "OK"
+    post:
+      tags:
+        - "Visits"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VisitCreateDto"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/VisitCreateDto"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/VisitCreateDto"
+      responses:
+        "200":
+          description: "OK"
+    put:
+      tags:
+        - "Visits"
+      parameters:
+        - name: "id"
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int32"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VisitCreateDto"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/VisitCreateDto"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/VisitCreateDto"
+      responses:
+        "200":
+          description: "OK"
+  /api/Visits/{id}:
+    delete:
+      tags:
+        - "Visits"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
 components:
   schemas:
     LoginDto:
-      type: object
+      type: "object"
       properties:
         username:
-          type: string
+          type: "string"
           nullable: true
         password:
-          type: string
+          type: "string"
           nullable: true
       additionalProperties: false
     PetCreateDto:
       required:
-        - name
-      type: object
+        - "name"
+      type: "object"
       properties:
         name:
-          type: string
           minLength: 1
+          type: "string"
         type:
-          type: string
+          type: "string"
           nullable: true
         birthDate:
-          type: string
-          format: date-time
+          type: "string"
+          format: "date-time"
         owner:
-          type: string
+          type: "string"
+          nullable: true
+      additionalProperties: false
+    RefreshTokenDto:
+      type: "object"
+      properties:
+        refreshToken:
+          type: "string"
+          nullable: true
+        id:
+          type: "integer"
+          format: "int32"
+        username:
+          type: "string"
           nullable: true
       additionalProperties: false
     RegisterDto:
       required:
-        - email
-        - password
-        - username
-      type: object
+        - "email"
+        - "password"
+        - "username"
+      type: "object"
       properties:
         username:
-          type: string
-          minLength: 1
           maxLength: 100
+          minLength: 1
+          type: "string"
         email:
-          type: string
-          minLength: 1
           maxLength: 100
+          minLength: 1
+          type: "string"
         password:
-          type: string
           minLength: 6
+          type: "string"
       additionalProperties: false
-    RefreshTokenDto:
-      type: object
+    ReminderCreateDto:
+      required:
+        - "petId"
+      type: "object"
       properties:
-        refreshToken:
-          type: string
+        petId:
+          type: "integer"
+          format: "int32"
+        message:
+          type: "string"
           nullable: true
-        id:
-          type: integer
-          format: int32
+        reminderDate:
+          type: "string"
+          format: "date-time"
+        isSent:
+          type: "boolean"
+      additionalProperties: false
+    UpdateProfileDto:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          nullable: true
+        email:
+          type: "string"
+          nullable: true
+      additionalProperties: false
+    UserCreateDto:
+      required:
+        - "email"
+        - "passwordHash"
+        - "username"
+      type: "object"
+      properties:
         username:
-          type: string
+          minLength: 1
+          type: "string"
+        email:
+          minLength: 1
+          type: "string"
+        passwordHash:
+          minLength: 1
+          type: "string"
+      additionalProperties: false
+    VisitCreateDto:
+      required:
+        - "petId"
+      type: "object"
+      properties:
+        petId:
+          type: "integer"
+          format: "int32"
+        visitDate:
+          type: "string"
+          format: "date-time"
+        description:
+          type: "string"
           nullable: true
+        isCompleted:
+          type: "boolean"
       additionalProperties: false
