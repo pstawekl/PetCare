@@ -1,1 +1,9 @@
+## Ignore Visual Studio temporary files
+.vs/
+*.user
+*.userosscache
+*.suo
+
+## Application settings
 appsettings.json
+appsettings.*.json
