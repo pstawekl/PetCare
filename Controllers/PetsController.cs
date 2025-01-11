@@ -1,25 +1,41 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System;
+using System.Threading.Tasks;
 
 [ApiController]
 [Route("api/[controller]")]
 // Kontroler do zarządzania zwierzętami
 public class PetsController : ControllerBase
 {
+    private readonly IPetRepository _petRepository;
+    private readonly ILogger<PetsController> _logger;
     private readonly AppDbContext _context;
 
-    public PetsController(AppDbContext context)
+    public PetsController(IPetRepository petRepository, ILogger<PetsController> logger, AppDbContext context)
     {
+        _petRepository = petRepository;
+        _logger = logger;
         _context = context;
     }
 
-    // Pobierz wszystkie zwierzęta
     [HttpGet]
-    public async Task<IActionResult> GetAllPets()
+    public async Task<ActionResult<IEnumerable<Pet>>> GetPets()
     {
-        var pets = await _context.Pets.ToListAsync();
-        return Ok(pets);
+        _logger.LogInformation("Getting all pets at {Time}", DateTime.Now);
+        try
+        {
+            var pets = await _petRepository.GetAllAsync();
+            return Ok(pets);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting pets");
+            return StatusCode(500, "Internal server error");
+        }
     }
 
     // Dodaj nowe zwierzę
@@ -35,7 +51,7 @@ public class PetsController : ControllerBase
         };
         await _context.Pets.AddAsync(pet);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetAllPets), new { id = pet.Id }, pet);
+        return CreatedAtAction(nameof(GetPets), new { id = pet.Id }, pet);
     }
 
     // Zaktualizuj istniejące zwierzę

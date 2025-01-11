@@ -3,8 +3,27 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using PetCare;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add environment configuration
+var environment = builder.Environment.EnvironmentName;
+builder.Configuration
+    .SetBasePath(builder.Environment.ContentRootPath)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
+// Configure Serilog based on environment
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.WithProperty("Environment", environment)
+    .CreateLogger();
+
+Log.Information("Application Starting in {Environment} mode", environment);
+
+builder.Host.UseSerilog();
 
 builder.Services.AddSingleton<JwtTokenService>();
 
@@ -33,7 +52,6 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
     
-builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
 builder.Services.AddLogging(logging =>
 {
@@ -41,12 +59,26 @@ builder.Services.AddLogging(logging =>
     logging.AddConsole();
 });
 
+builder.Services.AddHttpClient<IDogApiService, DogApiService>();
+
+// Add services based on environment
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddSwaggerGen();
+}
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
 
 // app.UseHttpsRedirection();

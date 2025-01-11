@@ -24,7 +24,6 @@
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
             },
-            "dotnetRunMessages": true,
             "internalConsoleOptions": "openOnSessionStart"
         }
     ]

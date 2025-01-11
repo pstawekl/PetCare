@@ -12,6 +12,7 @@ public class Pet
     public string Type { get; set; } // Typ zwierzęcia (np. pies, kot)
     public DateTime BirthDate { get; set; } // Data urodzenia zwierzęcia
     public string Owner { get; set; } // Właściciel zwierzęcia
+    public int OwnerId { get; set; } // Identyfikator właściciela
 }
 
 // Klasa DTO do tworzenia nowego zwierzęcia
@@ -22,4 +23,5 @@ public class PetCreateDto
     public string Type { get; set; } // Typ zwierzęcia
     public DateTime BirthDate { get; set; } // Data urodzenia zwierzęcia
     public string Owner { get; set; } // Właściciel zwierzęcia
+    public int OwnerId { get; set; } // Identyfikator właściciela
 }

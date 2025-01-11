@@ -13,6 +13,7 @@ namespace PetCare
         public DateTime VisitDate { get; set; } // Data wizyty
         public string Description { get; set; } // Opis wizyty
         public bool IsCompleted { get; set; } // Status ukończenia wizyty
+        public string VetName { get; set; } // Nazwa weterynarza
     }
 
     // DTO do tworzenia wizyty
@@ -23,5 +24,6 @@ namespace PetCare
         public DateTime VisitDate { get; set; } // Data wizyty
         public string Description { get; set; } // Opis wizyty
         public bool IsCompleted { get; set; } // Status ukończenia wizyty
+        public string VetName { get; set; } // Nazwa weterynarza
     }
 }
