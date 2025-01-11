@@ -23,7 +23,13 @@ Log.Logger = new LoggerConfiguration()
 
 Log.Information("Application Starting in {Environment} mode", environment);
 
-builder.Host.UseSerilog();
+builder.Host.UseSerilog((context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext()
+    .WriteTo.Console());
+
+builder.Services.AddRepositories();
 
 builder.Services.AddSingleton<JwtTokenService>();
 
@@ -60,6 +66,12 @@ builder.Services.AddLogging(logging =>
 });
 
 builder.Services.AddHttpClient<IDogApiService, DogApiService>();
+
+// Register repositories
+builder.Services.AddScoped<IPetRepository, PetRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IVisitRepository, VisitRepository>();
+builder.Services.AddScoped<IReminderRepository, ReminderRepository>();
 
 // Add services based on environment
 if (builder.Environment.IsDevelopment())

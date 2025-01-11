@@ -10,7 +10,7 @@ public class VisitRepository : BaseRepository<Visit>, IVisitRepository
     /// </summary>
     public async Task<IEnumerable<Visit>> GetUpcomingVisitsAsync()
     {
-        return await _context.Visits
+        return await _dbSet
             .Where(v => v.VisitDate >= DateTime.Today)
             .Include(v => v.PetId)
             .OrderBy(v => v.VisitDate)
@@ -22,7 +22,7 @@ public class VisitRepository : BaseRepository<Visit>, IVisitRepository
     /// </summary>
     public async Task<IEnumerable<Visit>> GetVisitsByVetNativeAsync(string vetName)
     {
-        return await _context.Visits
+        return await _dbSet
             .FromSqlRaw(@"
                 SELECT v.* 
                 FROM Visits v
@@ -36,7 +36,7 @@ public class VisitRepository : BaseRepository<Visit>, IVisitRepository
     /// </summary>
     public async Task<IEnumerable<Visit>> GetVisitsByPetIdAsync(int petId)
     {
-        return await _context.Visits
+        return await _dbSet
             .Where(v => v.PetId == petId)
             .OrderByDescending(v => v.VisitDate)
             .ToListAsync();

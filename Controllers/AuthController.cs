@@ -9,101 +9,95 @@ using System.ComponentModel.DataAnnotations;
 public class AuthController : ControllerBase
 {
     private readonly JwtTokenService _jwtTokenService;
-    private readonly UserRepository _userRepository;
-    private readonly Serilog.ILogger _logger;
+    private readonly IUserRepository _userRepository;
+    private readonly ILogger<AuthController> _logger;
+    private readonly AppDbContext _context;
 
-    // Konstruktor kontrolera autoryzacji
-    public AuthController(AppDbContext context, JwtTokenService jwtTokenService, UserRepository userRepository, Serilog.ILogger logger)
+    public AuthController(
+        JwtTokenService jwtTokenService, 
+        IUserRepository userRepository, 
+        ILogger<AuthController> logger,
+        AppDbContext context)
     {
         _jwtTokenService = jwtTokenService;
         _userRepository = userRepository;
         _logger = logger;
+        _context = context;
 
-        // Upewnij się, że tajny klucz JWT ma co najmniej 128 bitów (16 znaków)
         if (_jwtTokenService.SecretKey.Length < 16)
         {
             throw new ArgumentOutOfRangeException("SecretKey", "Algorytm szyfrowania 'HS256' wymaga klucza o rozmiarze co najmniej 128 bitów (16 znaków).");
         }
     }
 
-    /// <summary>
-    /// Logowanie użytkownika.
-    /// </summary>
-    /// <param name="login">Dane logowania.</param>
-    /// <param name="dbContext">Kontekst bazy danych.</param>
-    /// <returns>Tokeny dostępu i odświeżenia.</returns>
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginDto login, [FromServices] AppDbContext dbContext)
+    public async Task<IActionResult> Login([FromBody] LoginDto login)
     {
-        _logger.Information("User login attempt: {Username}", login.Username);
-        var user = await _userRepository.GetByEmailAsync(login.Username);
-
-        if (user != null)
+        _logger.LogInformation("User login attempt: {Username}", login.Username);
+        try
         {
-            if (BCrypt.Net.BCrypt.Verify(login.Password, user.PasswordHash))
+            var user = await _userRepository.GetByEmailAsync(login.Username);
+            if (user != null && BCrypt.Net.BCrypt.Verify(login.Password, user.PasswordHash))
             {
                 var accessToken = _jwtTokenService.GenerateAccessToken(user.Id.ToString(), user.Username);
                 var refreshToken = _jwtTokenService.GenerateRefreshToken(user.Id.ToString(), user.Username);
 
-                _logger.Information("User login successful: {Username}", login.Username);
-                return Ok(new
-                {
-                    AccessToken = accessToken,
-                    RefreshToken = refreshToken
-                });
+                _logger.LogInformation("User login successful: {Username}", login.Username);
+                return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
             }
-        }
 
-        _logger.Warning("User login failed: {Username}", login.Username);
-        return Unauthorized(new { Message = "Nieprawidłowa nazwa użytkownika lub hasło" });
+            _logger.LogWarning("User login failed: {Username}", login.Username);
+            return Unauthorized(new { Message = "Nieprawidłowa nazwa użytkownika lub hasło" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during login for user {Username}", login.Username);
+            return StatusCode(500, "Internal server error");
+        }
     }
 
-    /// <summary>
-    /// Rejestracja nowego użytkownika.
-    /// </summary>
-    /// <param name="registerDto">Dane rejestracyjne.</param>
-    /// <param name="dbContext">Kontekst bazy danych.</param>
-    /// <returns>Komunikat o sukcesie.</returns>
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterDto registerDto, [FromServices] AppDbContext dbContext)
+    public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
     {
-        _logger.Information("User registration attempt: {Username}", registerDto.Username);
-        // Sprawdź, czy użytkownik już istnieje
-        var existingUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == registerDto.Username);
-        if (existingUser != null)
+        _logger.LogInformation("User registration attempt: {Username}", registerDto.Username);
+        try
         {
-            _logger.Warning("User registration failed - user already exists: {Username}", registerDto.Username);
-            return Conflict(new { Message = "Użytkownik już istnieje" });
+            var existingUser = await _userRepository.GetByEmailAsync(registerDto.Username);
+            if (existingUser != null)
+            {
+                _logger.LogWarning("User registration failed - user exists: {Username}", registerDto.Username);
+                return Conflict(new { Message = "Użytkownik już istnieje" });
+            }
+
+            var user = new User
+            {
+                Username = registerDto.Username,
+                Email = registerDto.Email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password)
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("User registered successfully: {Username}", registerDto.Username);
+            return Ok(new { Message = "Użytkownik zarejestrowany pomyślnie" });
         }
-
-        // Zaszyfruj hasło
-        var passwordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
-
-        // Utwórz nowego użytkownika
-        var user = new User
+        catch (Exception ex)
         {
-            Username = registerDto.Username,
-            PasswordHash = passwordHash
-        };
-
-        // Zapisz użytkownika w bazie danych
-        dbContext.Users.Add(user);
-        await dbContext.SaveChangesAsync();
-
-        _logger.Information("User registered successfully: {Username}", registerDto.Username);
-        return Ok(new { Message = "Użytkownik zarejestrowany pomyślnie" });
+            _logger.LogError(ex, "Error during registration for user {Username}", registerDto.Username);
+            return StatusCode(500, "Internal server error");
+        }
     }
 
     /// <summary>
     /// Odświeża token dostępu.
     /// </summary>
     /// <param name="user">Dane użytkownika.</param>
-    /// <param name="dbContext">Kontekst bazy danych.</param>
     /// <returns>Nowe tokeny dostępu i odświeżenia.</returns>
     [HttpPost("refresh")]
-    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto user, [FromServices] AppDbContext dbContext)
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto user)
     {
-        _logger.Information("Token refresh attempt for user: {Username}", user.Username);
+        _logger.LogInformation("Token refresh attempt for user: {Username}", user.Username);
         if (user != null && _jwtTokenService.ValidateToken(user.RefreshToken) != null)
         {
             var newAccessToken = _jwtTokenService.GenerateAccessToken(user.Id.ToString(), user.Username);
@@ -111,7 +105,7 @@ public class AuthController : ControllerBase
 
             user.RefreshToken = newRefreshToken;
 
-            _logger.Information("Token refresh successful for user: {Username}", user.Username);
+            _logger.LogInformation("Token refresh successful for user: {Username}", user.Username);
             return Ok(new
             {
                 AccessToken = newAccessToken,
@@ -119,15 +113,15 @@ public class AuthController : ControllerBase
             });
         }
 
-        _logger.Warning("Token refresh failed for user: {Username}", user.Username);
+        _logger.LogWarning("Token refresh failed for user: {Username}", user.Username);
         return Unauthorized(new { Message = "Nieprawidłowy token odświeżenia" });
     }
 
     // Pobiera użytkownika na podstawie nazwy użytkownika
-    private async Task<User> GetUser(string username, AppDbContext dbContext)
+    private async Task<User> GetUser(string username)
     {
-        _logger.Information("Getting user by username: {Username}", username);
-        var existingUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == username);
+        _logger.LogInformation("Getting user by username: {Username}", username);
+        var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
 
         if (existingUser != null)
         {
@@ -151,14 +145,14 @@ public class AuthController : ControllerBase
     [HttpPost("verify")]
     public IActionResult VerifyToken([FromBody] string token)
     {
-        _logger.Information("Verifying token");
+        _logger.LogInformation("Verifying token");
         var principal = _jwtTokenService.ValidateToken(token);
         if (principal != null)
         {
-            _logger.Information("Token is valid");
+            _logger.LogInformation("Token is valid");
             return Ok(new { Message = "Token jest ważny" });
         }
-        _logger.Warning("Invalid token");
+        _logger.LogWarning("Invalid token");
         return Unauthorized(new { Message = "Nieprawidłowy token" });
     }
 }

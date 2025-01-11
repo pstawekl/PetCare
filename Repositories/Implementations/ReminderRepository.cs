@@ -10,7 +10,7 @@ public class ReminderRepository : BaseRepository<Reminder>, IReminderRepository
     /// </summary>
     public async Task<IEnumerable<Reminder>> GetActiveRemindersAsync()
     {
-        return await _context.Reminders
+        return await _dbSet
             .Where(r => !r.IsSent && r.ReminderDate >= DateTime.Today)
             .Include(r => r.PetId)
             .OrderBy(r => r.ReminderDate)
@@ -22,7 +22,7 @@ public class ReminderRepository : BaseRepository<Reminder>, IReminderRepository
     /// </summary>
     public async Task<IEnumerable<Reminder>> GetRemindersByUserIdNativeAsync(int userId)
     {
-        return await _context.Reminders
+        return await _dbSet
             .FromSqlRaw(@"
                 SELECT r.* 
                 FROM Reminders r
@@ -37,7 +37,7 @@ public class ReminderRepository : BaseRepository<Reminder>, IReminderRepository
     /// </summary>
     public async Task<IEnumerable<Reminder>> GetUpcomingRemindersForPetAsync(int petId)
     {
-        return await _context.Reminders
+        return await _dbSet
             .Where(r => r.PetId == petId && r.ReminderDate >= DateTime.Today)
             .OrderBy(r => r.ReminderDate)
             .ToListAsync();

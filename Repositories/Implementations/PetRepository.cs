@@ -10,7 +10,7 @@ public class PetRepository : BaseRepository<Pet>, IPetRepository
     /// </summary>
     public async Task<IEnumerable<Pet>> GetPetsBySpeciesAsync(string type)
     {
-        return await _context.Pets
+        return await _context.Set<Pet>()
             .Where(p => p.Type == type)
             .Include(p => p.Owner)
             .OrderBy(p => p.Name)
@@ -23,7 +23,7 @@ public class PetRepository : BaseRepository<Pet>, IPetRepository
     public async Task<IEnumerable<Visit>> GetPetsWithUpcomingVisitsAsync()
     {
         var today = DateTime.Today;
-        return await _context.Visits
+        return await _context.Set<Visit>()
             .Include(v => v.PetId)
             .Where(v => v.VisitDate >= today)
             .OrderBy(v => v.VisitDate)

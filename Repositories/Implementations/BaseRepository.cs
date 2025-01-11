@@ -1,56 +1,89 @@
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using PetCare;
 
 public abstract class BaseRepository<T> : IBaseRepository<T> where T : class
 {
     protected readonly AppDbContext _context;
+    protected readonly DbSet<T> _dbSet;
 
     protected BaseRepository(AppDbContext context)
     {
         _context = context;
+        _dbSet = context.Set<T>();
     }
 
-    /// <summary>
-    /// Pobiera wszystkie elementy.
-    /// </summary>
-    public async Task<IEnumerable<T>> GetAllAsync()
+    public virtual async Task<IEnumerable<T>> GetAllAsync()
     {
-        return await _context.Set<T>().ToListAsync();
+        try
+        {
+            return await _dbSet.ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new RepositoryException($"Error retrieving {typeof(T).Name} entities", ex);
+        }
     }
 
-    /// <summary>
-    /// Pobiera element według identyfikatora.
-    /// </summary>
-    public async Task<T> GetByIdAsync(int id)
+    public virtual async Task<T> GetByIdAsync(int id)
     {
-        return await _context.Set<T>().FindAsync(id);
+        try
+        {
+            var entity = await _dbSet.FindAsync(id);
+            if (entity == null)
+                throw new NotFoundException($"{typeof(T).Name} with id {id} not found");
+            return entity;
+        }
+        catch (Exception ex) when (!(ex is NotFoundException))
+        {
+            throw new RepositoryException($"Error retrieving {typeof(T).Name}", ex);
+        }
     }
 
-    /// <summary>
-    /// Dodaje nowy element.
-    /// </summary>
-    public async Task<T> AddAsync(T entity)
+    public virtual async Task<T> AddAsync(T entity)
     {
-        await _context.Set<T>().AddAsync(entity);
-        await _context.SaveChangesAsync();
-        return entity;
+        try
+        {
+            await _dbSet.AddAsync(entity);
+            await _context.SaveChangesAsync();
+            return entity;
+        }
+        catch (Exception ex)
+        {
+            throw new RepositoryException($"Error adding {typeof(T).Name}", ex);
+        }
     }
 
-    /// <summary>
-    /// Aktualizuje istniejący element.
-    /// </summary>
-    public async Task UpdateAsync(T entity)
+    public virtual async Task UpdateAsync(T entity)
     {
-        _context.Set<T>().Update(entity);
-        await _context.SaveChangesAsync();
+        try
+        {
+            _dbSet.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new RepositoryException($"Error updating {typeof(T).Name}", ex);
+        }
     }
 
-    /// <summary>
-    /// Usuwa element według identyfikatora.
-    /// </summary>
-    public async Task DeleteAsync(int id)
+    public virtual async Task DeleteAsync(int id)
     {
-        var entity = await GetByIdAsync(id);
-        _context.Set<T>().Remove(entity);
-        await _context.SaveChangesAsync();
+        try
+        {
+            var entity = await GetByIdAsync(id);
+            _dbSet.Remove(entity);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception ex) when (!(ex is NotFoundException))
+        {
+            throw new RepositoryException($"Error deleting {typeof(T).Name}", ex);
+        }
+    }
+
+    protected virtual IQueryable<T> Include(params Expression<Func<T, object>>[] includes)
+    {
+        IQueryable<T> query = _dbSet;
+        return includes.Aggregate(query, (current, include) => current.Include(include));
     }
 }
