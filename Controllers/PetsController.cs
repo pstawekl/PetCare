@@ -38,6 +38,25 @@ public class PetsController : ControllerBase
         }
     }
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Pet>> GetPet(int id)
+    {
+        _logger.LogInformation("Getting pet with id {Id} at {Time}", id, DateTime.Now);
+        try
+        {
+            var pet = await _petRepository.GetByIdAsync(id);
+            if (pet == null)
+                return NotFound();
+                
+            return Ok(pet);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting pet with id {Id}", id);
+            return StatusCode(500, "Internal server error");
+        }
+    }
+
     // Dodaj nowe zwierzę
     [HttpPost]
     public async Task<IActionResult> AddPet([FromBody] PetCreateDto petCreateDto)
@@ -49,7 +68,7 @@ public class PetsController : ControllerBase
             BirthDate = petCreateDto.BirthDate,
             Owner = petCreateDto.Owner
         };
-        await _context.Pets.AddAsync(pet);
+        await _petRepository.AddAsync(pet);
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetPets), new { id = pet.Id }, pet);
     }
@@ -58,22 +77,13 @@ public class PetsController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdatePet(int id, [FromBody] PetCreateDto petCreateDto)
     {
-        var existingPet = await _context.Pets.FindAsync(id);
+        var existingPet = await _petRepository.GetByIdAsync(id);
         if (existingPet == null) return NotFound();
 
-        var pet = new Pet
-        {
-            Id = id,
-            Name = petCreateDto.Name,
-            Type = petCreateDto.Type,
-            BirthDate = petCreateDto.BirthDate,
-            Owner = petCreateDto.Owner
-        };
-
-        existingPet.Name = pet.Name;
-        existingPet.Type = pet.Type;
-        existingPet.BirthDate = pet.BirthDate;
-        existingPet.Owner = pet.Owner;
+        existingPet.Name = petCreateDto.Name;
+        existingPet.Type = petCreateDto.Type;
+        existingPet.BirthDate = petCreateDto.BirthDate;
+        existingPet.Owner = petCreateDto.Owner;
 
         await _context.SaveChangesAsync();
         return NoContent();
@@ -83,9 +93,9 @@ public class PetsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePet(int id)
     {
-        var pet = await _context.Pets.FindAsync(id);
+        var pet = await _petRepository.GetByIdAsync(id);
         if (pet == null) return NotFound();
-        _context.Pets.Remove(pet);
+        _petRepository.DeleteAsync(pet.Id);
         await _context.SaveChangesAsync();
         return NoContent();
     }

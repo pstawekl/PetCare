@@ -1,0 +1,71 @@
+2025-01-11 13:30:16.408 +01:00 [INF] Application Starting in Development mode
+2025-01-11 13:30:17.050 +01:00 [INF] User profile is available. Using 'C:\Users\STW\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-01-11 13:30:17.218 +01:00 [INF] Now listening on: https://localhost:7138
+2025-01-11 13:30:17.219 +01:00 [INF] Now listening on: http://localhost:5062
+2025-01-11 13:30:17.223 +01:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-01-11 13:30:17.224 +01:00 [INF] Hosting environment: Development
+2025-01-11 13:30:17.224 +01:00 [INF] Content root path: C:\Users\STW\OneDrive\Dokumenty\VSC Projects\PetCare_Backend
+2025-01-11 13:30:17.540 +01:00 [INF] Request starting HTTP/2 GET https://localhost:7138/swagger/index.html - null null
+2025-01-11 13:30:17.722 +01:00 [INF] Request finished HTTP/2 GET https://localhost:7138/swagger/index.html - 200 null text/html;charset=utf-8 183.5836ms
+2025-01-11 13:30:17.750 +01:00 [INF] Request starting HTTP/2 GET https://localhost:7138/swagger/index.js - null null
+2025-01-11 13:30:17.754 +01:00 [INF] Request finished HTTP/2 GET https://localhost:7138/swagger/index.js - 200 null application/javascript;charset=utf-8 3.6628ms
+2025-01-11 13:30:17.868 +01:00 [INF] Request starting HTTP/2 GET https://localhost:7138/swagger/v1/swagger.json - null null
+2025-01-11 13:30:18.008 +01:00 [INF] Request finished HTTP/2 GET https://localhost:7138/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 139.8489ms
+2025-01-11 13:30:34.897 +01:00 [INF] Request starting HTTP/2 GET https://localhost:7138/api/Pets/1 - null null
+2025-01-11 13:30:35.021 +01:00 [INF] Executing endpoint 'PetsController.GetPet (PetCare)'
+2025-01-11 13:30:35.045 +01:00 [INF] Route matched with {action = "GetPet", controller = "Pets"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[Pet]] GetPet(Int32) on controller PetsController (PetCare).
+2025-01-11 13:30:35.055 +01:00 [INF] Executed action PetsController.GetPet (PetCare) in 6.1512ms
+2025-01-11 13:30:35.056 +01:00 [INF] Executed endpoint 'PetsController.GetPet (PetCare)'
+2025-01-11 13:30:35.060 +01:00 [ERR] An unhandled exception has occurred while executing the request.
+System.InvalidOperationException: Unable to resolve service for type 'IPetRepository' while attempting to activate 'PetsController'.
+   at Microsoft.Extensions.DependencyInjection.ActivatorUtilities.ThrowHelperUnableToResolveService(Type type, Type requiredBy)
+   at lambda_method16(Closure, IServiceProvider, Object[])
+   at Microsoft.AspNetCore.Mvc.Controllers.ControllerFactoryProvider.<>c__DisplayClass6_0.<CreateControllerFactory>g__CreateController|0(ControllerContext controllerContext)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+2025-01-11 13:30:35.084 +01:00 [INF] Request finished HTTP/2 GET https://localhost:7138/api/Pets/1 - 500 null text/plain; charset=utf-8 186.6428ms
+2025-01-11 13:30:51.790 +01:00 [INF] Request starting HTTP/2 GET https://localhost:7138/api/DogBreeds - null null
+2025-01-11 13:30:51.793 +01:00 [INF] Executing endpoint 'DogBreedsController.GetAllBreeds (PetCare)'
+2025-01-11 13:30:51.797 +01:00 [INF] Route matched with {action = "GetAllBreeds", controller = "DogBreeds"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[DogBreed]]] GetAllBreeds() on controller DogBreedsController (PetCare).
+2025-01-11 13:30:51.810 +01:00 [INF] Getting all dog breeds
+2025-01-11 13:30:51.828 +01:00 [INF] Start processing HTTP request GET https://api.thedogapi.com/v1/breeds
+2025-01-11 13:30:51.830 +01:00 [INF] Sending HTTP request GET https://api.thedogapi.com/v1/breeds
+2025-01-11 13:30:52.405 +01:00 [INF] Received HTTP response headers after 572.3113ms - 200
+2025-01-11 13:30:52.406 +01:00 [INF] End processing HTTP request after 581.2915ms - 200
+2025-01-11 13:30:52.626 +01:00 [INF] Executing OkObjectResult, writing value of type 'System.Collections.Generic.List`1[[DogBreed, PetCare, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-01-11 13:30:52.643 +01:00 [INF] Executed action DogBreedsController.GetAllBreeds (PetCare) in 845.9086ms
+2025-01-11 13:30:52.644 +01:00 [INF] Executed endpoint 'DogBreedsController.GetAllBreeds (PetCare)'
+2025-01-11 13:30:52.645 +01:00 [INF] Request finished HTTP/2 GET https://localhost:7138/api/DogBreeds - 200 null application/json; charset=utf-8 855.408ms
+2025-01-11 13:43:24.132 +01:00 [INF] Request starting HTTP/2 GET https://localhost:7138/api/DogBreeds/Affenpinscher - null null
+2025-01-11 13:43:24.135 +01:00 [INF] Executing endpoint 'DogBreedsController.GetBreedByName (PetCare)'
+2025-01-11 13:43:24.139 +01:00 [INF] Route matched with {action = "GetBreedByName", controller = "DogBreeds"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[DogBreed]] GetBreedByName(System.String) on controller DogBreedsController (PetCare).
+2025-01-11 13:43:24.159 +01:00 [INF] Getting dog breed information for: Affenpinscher
+2025-01-11 13:43:24.161 +01:00 [INF] Start processing HTTP request GET https://api.thedogapi.com/v1/breeds/search?q=Affenpinscher
+2025-01-11 13:43:24.161 +01:00 [INF] Sending HTTP request GET https://api.thedogapi.com/v1/breeds/search?q=Affenpinscher
+2025-01-11 13:43:25.014 +01:00 [INF] Received HTTP response headers after 853.2722ms - 200
+2025-01-11 13:43:25.015 +01:00 [INF] End processing HTTP request after 854.1336ms - 200
+2025-01-11 13:43:25.016 +01:00 [INF] Executing OkObjectResult, writing value of type 'DogBreed'.
+2025-01-11 13:43:25.017 +01:00 [INF] Executed action DogBreedsController.GetBreedByName (PetCare) in 877.6498ms
+2025-01-11 13:43:25.017 +01:00 [INF] Executed endpoint 'DogBreedsController.GetBreedByName (PetCare)'
+2025-01-11 13:43:25.017 +01:00 [INF] Request finished HTTP/2 GET https://localhost:7138/api/DogBreeds/Affenpinscher - 200 null application/json; charset=utf-8 885.6242ms
+2025-01-11 13:57:58.093 +01:00 [INF] Application Starting in Development mode
+2025-01-11 13:57:58.484 +01:00 [INF] User profile is available. Using 'C:\Users\STW\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-01-11 13:57:58.637 +01:00 [INF] Now listening on: https://localhost:7138
+2025-01-11 13:57:58.639 +01:00 [INF] Now listening on: http://localhost:5062
+2025-01-11 13:57:58.641 +01:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-01-11 13:57:58.642 +01:00 [INF] Hosting environment: Development
+2025-01-11 13:57:58.642 +01:00 [INF] Content root path: C:\Users\STW\OneDrive\Dokumenty\VSC Projects\PetCare_Backend
+2025-01-11 13:57:58.876 +01:00 [INF] Request starting HTTP/2 GET https://localhost:7138/swagger/index.html - null null
+2025-01-11 13:57:58.977 +01:00 [INF] Request finished HTTP/2 GET https://localhost:7138/swagger/index.html - 200 null text/html;charset=utf-8 102.1337ms
+2025-01-11 13:57:59.000 +01:00 [INF] Request starting HTTP/2 GET https://localhost:7138/swagger/index.js - null null
+2025-01-11 13:57:59.004 +01:00 [INF] Request finished HTTP/2 GET https://localhost:7138/swagger/index.js - 200 null application/javascript;charset=utf-8 3.404ms
+2025-01-11 13:57:59.088 +01:00 [INF] Request starting HTTP/2 GET https://localhost:7138/swagger/v1/swagger.json - null null
+2025-01-11 13:57:59.199 +01:00 [INF] Request finished HTTP/2 GET https://localhost:7138/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 111.1775ms

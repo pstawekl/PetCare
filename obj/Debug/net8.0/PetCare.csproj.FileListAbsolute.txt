@@ -314,3 +314,4 @@ C:\Users\STW\OneDrive\Dokumenty\VSC Projects\PetCare_Backend\bin\Debug\net8.0\Pe
 C:\Users\STW\OneDrive\Dokumenty\VSC Projects\PetCare_Backend\obj\Debug\net8.0\PetCare.csproj.Up2Date
 C:\Users\STW\OneDrive\Dokumenty\VSC Projects\PetCare_Backend\obj\Debug\net8.0\PetCare.genruntimeconfig.cache
 C:\Users\STW\OneDrive\Dokumenty\VSC Projects\PetCare_Backend\obj\Debug\net8.0\ref\PetCare.dll
+C:\Users\STW\OneDrive\Dokumenty\VSC Projects\PetCare_Backend\bin\Debug\net8.0\appsettings.Production.json

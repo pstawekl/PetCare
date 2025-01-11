@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PetCare;
 
 namespace PetCare.Controllers
 {
@@ -8,12 +9,12 @@ namespace PetCare.Controllers
     // Kontroler do zarządzania wizytami
     public class VisitsController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IVisitRepository _visitRepository;
 
         // Konstruktor kontrolera wizyt
-        public VisitsController(AppDbContext context)
+        public VisitsController(IVisitRepository visitRepository)
         {
-            _context = context;
+            _visitRepository = visitRepository;
         }
 
         /// <summary>
@@ -23,7 +24,7 @@ namespace PetCare.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllVisits()
         {
-            var visits = await _context.Visits.ToListAsync();
+            var visits = await _visitRepository.GetAllAsync();
             return Ok(visits);
         }
 
@@ -42,8 +43,7 @@ namespace PetCare.Controllers
                 Description = visitCreateDto.Description,
                 IsCompleted = visitCreateDto.IsCompleted
             };
-            await _context.Visits.AddAsync(visit);
-            await _context.SaveChangesAsync();
+            await _visitRepository.AddAsync(visit);
             return CreatedAtAction(nameof(GetAllVisits), new { id = visit.Id }, visit);
         }
 
@@ -53,27 +53,18 @@ namespace PetCare.Controllers
         /// <param name="id">ID wizyty do edycji.</param>
         /// <param name="visitCreateDto">Zaktualizowane dane wizyty.</param>
         /// <returns>Brak zawartości.</returns>
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> EditVisit(int id, [FromBody] VisitCreateDto visitCreateDto)
         {
-            var existingVisit = await _context.Visits.FindAsync(id);
+            var existingVisit = await _visitRepository.GetByIdAsync(id);
             if (existingVisit == null) return NotFound();
 
-            var visit = new Visit
-            {
-                Id = id,
-                PetId = visitCreateDto.PetId,
-                VisitDate = visitCreateDto.VisitDate,
-                Description = visitCreateDto.Description,
-                IsCompleted = visitCreateDto.IsCompleted
-            };
+            existingVisit.PetId = visitCreateDto.PetId;
+            existingVisit.VisitDate = visitCreateDto.VisitDate;
+            existingVisit.Description = visitCreateDto.Description;
+            existingVisit.IsCompleted = visitCreateDto.IsCompleted;
 
-            existingVisit.PetId = visit.PetId;
-            existingVisit.VisitDate = visit.VisitDate;
-            existingVisit.Description = visit.Description;
-            existingVisit.IsCompleted = visit.IsCompleted;
-
-            await _context.SaveChangesAsync();
+            await _visitRepository.UpdateAsync(existingVisit);
             return NoContent();
         }
 
@@ -85,10 +76,9 @@ namespace PetCare.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVisit(int id)
         {
-            var visit = await _context.Visits.FindAsync(id);
+            var visit = await _visitRepository.GetByIdAsync(id);
             if (visit == null) return NotFound();
-            _context.Visits.Remove(visit);
-            await _context.SaveChangesAsync();
+            await _visitRepository.DeleteAsync(visit.Id);
             return NoContent();
         }
     }

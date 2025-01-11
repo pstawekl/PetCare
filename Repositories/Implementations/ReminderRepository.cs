@@ -5,6 +5,9 @@ public class ReminderRepository : BaseRepository<Reminder>, IReminderRepository
 {
     public ReminderRepository(AppDbContext context) : base(context) { }
 
+    /// <summary>
+    /// Pobiera aktywne przypomnienia.
+    /// </summary>
     public async Task<IEnumerable<Reminder>> GetActiveRemindersAsync()
     {
         return await _context.Reminders
@@ -14,6 +17,9 @@ public class ReminderRepository : BaseRepository<Reminder>, IReminderRepository
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Pobiera przypomnienia według identyfikatora użytkownika.
+    /// </summary>
     public async Task<IEnumerable<Reminder>> GetRemindersByUserIdNativeAsync(int userId)
     {
         return await _context.Reminders
@@ -26,6 +32,9 @@ public class ReminderRepository : BaseRepository<Reminder>, IReminderRepository
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Pobiera nadchodzące przypomnienia dla zwierzęcia.
+    /// </summary>
     public async Task<IEnumerable<Reminder>> GetUpcomingRemindersForPetAsync(int petId)
     {
         return await _context.Reminders

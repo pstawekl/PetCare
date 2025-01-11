@@ -1,18 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using PetCare;
 namespace PetCare.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class RemindersController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IReminderRepository _reminderRepository;
 
         // Konstruktor kontrolera przypomnień
-        public RemindersController(AppDbContext context)
+        public RemindersController(IReminderRepository reminderRepository)
         {
-            _context = context;
+            _reminderRepository = reminderRepository;
         }
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace PetCare.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllReminders()
         {
-            var reminders = await _context.Reminders.ToListAsync();
+            var reminders = await _reminderRepository.GetAllAsync();
             return Ok(reminders);
         }
 
@@ -41,8 +41,7 @@ namespace PetCare.Controllers
                 ReminderDate = reminderCreateDto.ReminderDate,
                 IsSent = reminderCreateDto.IsSent
             };
-            await _context.Reminders.AddAsync(reminder);
-            await _context.SaveChangesAsync();
+            await _reminderRepository.AddAsync(reminder);
             return CreatedAtAction(nameof(GetAllReminders), new { id = reminder.Id }, reminder);
         }
 
@@ -55,23 +54,14 @@ namespace PetCare.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateReminder(int id, [FromBody] ReminderCreateDto reminderCreateDto)
         {
-            var existingReminder = await _context.Reminders.FindAsync(id);
+            var existingReminder = await _reminderRepository.GetByIdAsync(id);
             if (existingReminder == null) return NotFound();
 
-            var reminder = new Reminder
-            {
-                Id = id,
-                IsSent = reminderCreateDto.IsSent,
-                Message = reminderCreateDto.Message,
-                PetId = reminderCreateDto.PetId,
-                ReminderDate = reminderCreateDto.ReminderDate
-            };
+            existingReminder.Message = reminderCreateDto.Message;
+            existingReminder.ReminderDate = reminderCreateDto.ReminderDate;
+            existingReminder.IsSent = reminderCreateDto.IsSent;
 
-            existingReminder.Message = reminder.Message;
-            existingReminder.ReminderDate = reminder.ReminderDate;
-            existingReminder.IsSent = reminder.IsSent;
-
-            await _context.SaveChangesAsync();
+            await _reminderRepository.UpdateAsync(existingReminder);
             return NoContent();
         }
 
@@ -83,10 +73,9 @@ namespace PetCare.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReminder(int id)
         {
-            var reminder = await _context.Reminders.FindAsync(id);
+            var reminder = await _reminderRepository.GetByIdAsync(id);
             if (reminder == null) return NotFound();
-            _context.Reminders.Remove(reminder);
-            await _context.SaveChangesAsync();
+            await _reminderRepository.DeleteAsync(reminder.Id);
             return NoContent();
         }
     }

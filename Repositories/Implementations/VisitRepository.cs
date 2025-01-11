@@ -5,6 +5,9 @@ public class VisitRepository : BaseRepository<Visit>, IVisitRepository
 {
     public VisitRepository(AppDbContext context) : base(context) { }
 
+    /// <summary>
+    /// Pobiera nadchodzące wizyty.
+    /// </summary>
     public async Task<IEnumerable<Visit>> GetUpcomingVisitsAsync()
     {
         return await _context.Visits
@@ -14,6 +17,9 @@ public class VisitRepository : BaseRepository<Visit>, IVisitRepository
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Pobiera wizyty według imienia weterynarza.
+    /// </summary>
     public async Task<IEnumerable<Visit>> GetVisitsByVetNativeAsync(string vetName)
     {
         return await _context.Visits
@@ -25,6 +31,9 @@ public class VisitRepository : BaseRepository<Visit>, IVisitRepository
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Pobiera wizyty według identyfikatora zwierzęcia.
+    /// </summary>
     public async Task<IEnumerable<Visit>> GetVisitsByPetIdAsync(int petId)
     {
         return await _context.Visits

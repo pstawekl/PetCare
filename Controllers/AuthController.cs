@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PetCare;
+using Serilog;
 using System.ComponentModel.DataAnnotations;
 
 [ApiController]
@@ -8,11 +9,15 @@ using System.ComponentModel.DataAnnotations;
 public class AuthController : ControllerBase
 {
     private readonly JwtTokenService _jwtTokenService;
+    private readonly UserRepository _userRepository;
+    private readonly Serilog.ILogger _logger;
 
     // Konstruktor kontrolera autoryzacji
-    public AuthController(AppDbContext context, JwtTokenService jwtTokenService)
+    public AuthController(AppDbContext context, JwtTokenService jwtTokenService, UserRepository userRepository, Serilog.ILogger logger)
     {
         _jwtTokenService = jwtTokenService;
+        _userRepository = userRepository;
+        _logger = logger;
 
         // Upewnij się, że tajny klucz JWT ma co najmniej 128 bitów (16 znaków)
         if (_jwtTokenService.SecretKey.Length < 16)
@@ -30,7 +35,8 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto login, [FromServices] AppDbContext dbContext)
     {
-        var user = await GetUser(login.Username, dbContext);
+        _logger.Information("User login attempt: {Username}", login.Username);
+        var user = await _userRepository.GetByEmailAsync(login.Username);
 
         if (user != null)
         {
@@ -39,6 +45,7 @@ public class AuthController : ControllerBase
                 var accessToken = _jwtTokenService.GenerateAccessToken(user.Id.ToString(), user.Username);
                 var refreshToken = _jwtTokenService.GenerateRefreshToken(user.Id.ToString(), user.Username);
 
+                _logger.Information("User login successful: {Username}", login.Username);
                 return Ok(new
                 {
                     AccessToken = accessToken,
@@ -47,6 +54,7 @@ public class AuthController : ControllerBase
             }
         }
 
+        _logger.Warning("User login failed: {Username}", login.Username);
         return Unauthorized(new { Message = "Nieprawidłowa nazwa użytkownika lub hasło" });
     }
 
@@ -59,10 +67,12 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto registerDto, [FromServices] AppDbContext dbContext)
     {
+        _logger.Information("User registration attempt: {Username}", registerDto.Username);
         // Sprawdź, czy użytkownik już istnieje
         var existingUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == registerDto.Username);
         if (existingUser != null)
         {
+            _logger.Warning("User registration failed - user already exists: {Username}", registerDto.Username);
             return Conflict(new { Message = "Użytkownik już istnieje" });
         }
 
@@ -80,6 +90,7 @@ public class AuthController : ControllerBase
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
 
+        _logger.Information("User registered successfully: {Username}", registerDto.Username);
         return Ok(new { Message = "Użytkownik zarejestrowany pomyślnie" });
     }
 
@@ -92,6 +103,7 @@ public class AuthController : ControllerBase
     [HttpPost("refresh")]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto user, [FromServices] AppDbContext dbContext)
     {
+        _logger.Information("Token refresh attempt for user: {Username}", user.Username);
         if (user != null && _jwtTokenService.ValidateToken(user.RefreshToken) != null)
         {
             var newAccessToken = _jwtTokenService.GenerateAccessToken(user.Id.ToString(), user.Username);
@@ -99,6 +111,7 @@ public class AuthController : ControllerBase
 
             user.RefreshToken = newRefreshToken;
 
+            _logger.Information("Token refresh successful for user: {Username}", user.Username);
             return Ok(new
             {
                 AccessToken = newAccessToken,
@@ -106,12 +119,14 @@ public class AuthController : ControllerBase
             });
         }
 
+        _logger.Warning("Token refresh failed for user: {Username}", user.Username);
         return Unauthorized(new { Message = "Nieprawidłowy token odświeżenia" });
     }
 
     // Pobiera użytkownika na podstawie nazwy użytkownika
     private async Task<User> GetUser(string username, AppDbContext dbContext)
     {
+        _logger.Information("Getting user by username: {Username}", username);
         var existingUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == username);
 
         if (existingUser != null)
@@ -136,11 +151,14 @@ public class AuthController : ControllerBase
     [HttpPost("verify")]
     public IActionResult VerifyToken([FromBody] string token)
     {
+        _logger.Information("Verifying token");
         var principal = _jwtTokenService.ValidateToken(token);
         if (principal != null)
         {
+            _logger.Information("Token is valid");
             return Ok(new { Message = "Token jest ważny" });
         }
+        _logger.Warning("Invalid token");
         return Unauthorized(new { Message = "Nieprawidłowy token" });
     }
 }

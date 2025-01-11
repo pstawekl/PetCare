@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Security.Claims;
 
 namespace PetCare.Controllers
@@ -10,11 +11,13 @@ namespace PetCare.Controllers
     public class ProfileController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly Serilog.ILogger _logger;
 
         // Konstruktor kontrolera wizyt
-        public ProfileController(AppDbContext context)
+        public ProfileController(AppDbContext context, Serilog.ILogger logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         /// <summary>
@@ -26,6 +29,7 @@ namespace PetCare.Controllers
         [HttpPost("{id}")]
         public async Task<IActionResult> GetProfile(int id, [FromServices] AppDbContext dbContext)
         {
+            _logger.Information("Getting profile for user ID: {UserId}", id);
             var existingUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
 
             if (existingUser != null)
@@ -37,6 +41,7 @@ namespace PetCare.Controllers
                     Username = existingUser.Username
                 });
             }
+            _logger.Warning("User profile not found for ID: {UserId}", id);
             return NotFound();
         }
 
@@ -48,6 +53,7 @@ namespace PetCare.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProfile(int id, [FromBody] UpdateProfileDto updateProfile, [FromServices] AppDbContext dbContext)
         {
+            _logger.Information("Updating profile for user ID: {UserId}", id);
             var existingUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
 
             if (existingUser != null)
@@ -57,8 +63,10 @@ namespace PetCare.Controllers
 
                 await dbContext.SaveChangesAsync();
 
+                _logger.Information("Profile updated successfully for user ID: {UserId}", id);
                 return Ok(new { Message = "Profil zaktualizowany pomyślnie" });
             }
+            _logger.Warning("User profile not found for ID: {UserId}", id);
             return NotFound();
         }
     }

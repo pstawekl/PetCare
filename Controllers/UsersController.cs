@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PetCare;
 
 namespace PetCare.Controllers
 {
@@ -7,18 +8,18 @@ namespace PetCare.Controllers
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IUserRepository _userRepository;
 
-        public UsersController(AppDbContext context)
+        public UsersController(IUserRepository userRepository)
         {
-            _context = context;
+            _userRepository = userRepository;
         }
 
         // Pobierz wszystkich użytkowników
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
-            var users = await _context.Users.ToListAsync();
+            var users = await _userRepository.GetAllAsync();
             return Ok(users);
         }
 
@@ -33,8 +34,7 @@ namespace PetCare.Controllers
                 PasswordHash = userCreateDto.PasswordHash
             };
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+            await _userRepository.AddAsync(user);
             return CreatedAtAction(nameof(GetAllUsers), new { id = user.Id }, user);
         }
 
@@ -42,21 +42,13 @@ namespace PetCare.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserCreateDto userCreateDto)
         {
-            var existingUser = await _context.Users.FindAsync(id);
+            var existingUser = await _userRepository.GetByIdAsync(id);
             if (existingUser == null) return NotFound();
 
-            var user = new User
-            {
-                Id = id,
-                Email = userCreateDto.Email,
-                Username = userCreateDto.Username,
-                PasswordHash = userCreateDto.PasswordHash
-            };
+            existingUser.Email = userCreateDto.Email;
+            existingUser.Username = userCreateDto.Username;
 
-            existingUser.Email = user.Email;
-            existingUser.Username = user.Username;
-
-            await _context.SaveChangesAsync();
+            await _userRepository.UpdateAsync(existingUser);
             return NoContent();
         }
 
@@ -64,10 +56,9 @@ namespace PetCare.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _userRepository.GetByIdAsync(id);
             if (user == null) return NotFound();
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            await _userRepository.DeleteAsync(user.Id);
             return NoContent();
         }
     }

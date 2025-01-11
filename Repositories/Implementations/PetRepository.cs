@@ -5,6 +5,9 @@ public class PetRepository : BaseRepository<Pet>, IPetRepository
 {
     public PetRepository(AppDbContext context) : base(context) { }
 
+    /// <summary>
+    /// Pobiera zwierzęta według gatunku.
+    /// </summary>
     public async Task<IEnumerable<Pet>> GetPetsBySpeciesAsync(string type)
     {
         return await _context.Pets
@@ -14,6 +17,9 @@ public class PetRepository : BaseRepository<Pet>, IPetRepository
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Pobiera zwierzęta z nadchodzącymi wizytami.
+    /// </summary>
     public async Task<IEnumerable<Visit>> GetPetsWithUpcomingVisitsAsync()
     {
         var today = DateTime.Today;
@@ -24,6 +30,9 @@ public class PetRepository : BaseRepository<Pet>, IPetRepository
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Wyszukuje zwierzęta według imienia właściciela.
+    /// </summary>
     public async Task<IEnumerable<Pet>> FindPetsByOwnerNameNativeAsync(string ownerName)
     {
         return await _context.Pets
